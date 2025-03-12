@@ -22,12 +22,11 @@ local function highlightZombies()
                 if not zombie:FindFirstChild("BillboardGui") then
                     local billboard = Instance.new("BillboardGui")
                     billboard.Size = UDim2.new(4, 0, 1, 0)
-                    billboard.StudsOffset = Vector3.new(0, 3, 0) -- Adjust height above the head
+                    billboard.StudsOffset = Vector3.new(0, 3, 0)
                     billboard.Adornee = zombie.PrimaryPart
                     billboard.Parent = zombie
                     billboard.AlwaysOnTop = true
 
-                    -- Create the TextLabel
                     local textLabel = Instance.new("TextLabel")
                     textLabel.Size = UDim2.new(1, 0, 1, 0)
                     textLabel.BackgroundTransparency = 1
@@ -42,45 +41,29 @@ local function highlightZombies()
             else
                 -- Remove Highlight if ESP is disabled
                 local highlight = zombie:FindFirstChild("Highlight")
-                if highlight then
-                    highlight:Destroy()
-                end
+                if highlight then highlight:Destroy() end
 
                 -- Remove BillboardGui if ESP is disabled
                 local billboard = zombie:FindFirstChild("BillboardGui")
-                if billboard then
-                    billboard:Destroy()
-                end
+                if billboard then billboard:Destroy() end
             end
         end
     end
 end
 
--- Toggle ESP function
 local function toggleESP()
     espEnabled = not espEnabled
 
     if espEnabled then
         highlightZombies()
-        heartbeatConnection = runService.Heartbeat:Connect(highlightZombies) -- Run ESP check continuously
-        Rayfield:Notify({
-            Title = "ESP Enabled",
-            Content = "ESP is now active!",
-            Duration = 3,
-            Image = 4483362458
-        })
+        heartbeatConnection = runService.Heartbeat:Connect(highlightZombies)
     else
         if heartbeatConnection then
-            heartbeatConnection:Disconnect() -- Stop the loop
+            heartbeatConnection:Disconnect()
             heartbeatConnection = nil
         end
-
-        highlightZombies() -- This will remove existing ESP elements
-        Rayfield:Notify({
-            Title = "ESP Disabled",
-            Content = "ESP has been turned off",
-            Duration = 3,
-            Image = 4483362458
-        })
+        highlightZombies() -- Remove ESP elements
     end
 end
+
+return toggleESP -- Return function for use in main script
