@@ -9,16 +9,14 @@ local function highlightZombies()
     for _, zombie in pairs(zombiesFolder:GetChildren()) do
         if zombie:IsA("Model") and zombie.PrimaryPart then
             if espEnabled then
-                -- Create Highlight if it doesn't exist
                 if not zombie:FindFirstChild("Highlight") then
                     local highlight = Instance.new("Highlight")
                     highlight.Adornee = zombie
-                    highlight.FillColor = Color3.fromRGB(255, 0, 0) -- Red highlight
-                    highlight.OutlineColor = Color3.fromRGB(255, 255, 255) -- White outline
+                    highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                    highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
                     highlight.Parent = zombie
                 end
 
-                -- Create BillboardGui if it doesn't exist
                 if not zombie:FindFirstChild("BillboardGui") then
                     local billboard = Instance.new("BillboardGui")
                     billboard.Size = UDim2.new(4, 0, 1, 0)
@@ -39,11 +37,9 @@ local function highlightZombies()
                     textLabel.Parent = billboard
                 end
             else
-                -- Remove Highlight if ESP is disabled
                 local highlight = zombie:FindFirstChild("Highlight")
                 if highlight then highlight:Destroy() end
 
-                -- Remove BillboardGui if ESP is disabled
                 local billboard = zombie:FindFirstChild("BillboardGui")
                 if billboard then billboard:Destroy() end
             end
@@ -62,8 +58,8 @@ local function toggleESP()
             heartbeatConnection:Disconnect()
             heartbeatConnection = nil
         end
-        highlightZombies() -- Remove ESP elements
+        highlightZombies() -- Remove ESP effects
     end
 end
 
-return toggleESP -- Return function for use in main script
+return toggleESP -- ✅ Returns function for toggling ESP
