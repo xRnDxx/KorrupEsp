@@ -1,0 +1,52 @@
+local RunService = game:GetService("RunService")
+
+local zombiesFolder = game.Workspace:FindFirstChild("Zombies")
+
+if not zombiesFolder then
+    warn("Zombies folder not found in Workspace!")
+    return
+end
+
+local function highlightZombies()
+    for _, zombie in pairs(zombiesFolder:GetChildren()) do
+        if zombie:IsA("Model") and zombie.PrimaryPart then
+            if not zombie:FindFirstChild("Highlight") then
+                local highlight = Instance.new("Highlight")
+                highlight.Adornee = zombie
+                highlight.FillColor = Color3.fromRGB(255, 0, 0) -- Red highlight
+                highlight.OutlineColor = Color3.fromRGB(255, 255, 255) -- White outline
+                highlight.Parent = zombie
+            end
+
+            if not zombie:FindFirstChild("BillboardGui") then
+                -- Create a BillboardGui for the nametag
+                local billboard = Instance.new("BillboardGui")
+                billboard.Size = UDim2.new(4, 0, 1, 0)
+                billboard.StudsOffset = Vector3.new(0, 3, 0) -- Adjust height above the head
+                billboard.Adornee = zombie.PrimaryPart
+                billboard.Parent = zombie
+                billboard.AlwaysOnTop = true
+
+                -- Create the TextLabel
+                local textLabel = Instance.new("TextLabel")
+                textLabel.Size = UDim2.new(1, 0, 1, 0)
+                textLabel.BackgroundTransparency = 1
+                textLabel.Text = "Stupid Zombie"
+                textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+                textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+                textLabel.TextStrokeTransparency = 0
+                textLabel.Font = Enum.Font.SourceSansBold
+                textLabel.TextScaled = true
+                textLabel.Parent = billboard
+            end
+        end
+    end
+end
+
+-- Run the function initially
+highlightZombies()
+
+-- Check for new zombies in a loop
+RunService.Heartbeat:Connect(function()
+    highlightZombies()
+end)
