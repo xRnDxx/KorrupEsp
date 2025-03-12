@@ -1,52 +1,86 @@
-local RunService = game:GetService("RunService")
-
+local espEnabled = false
+local runService = game:GetService("RunService")
 local zombiesFolder = game.Workspace:FindFirstChild("Zombies")
-
-if not zombiesFolder then
-    warn("Zombies folder not found in Workspace!")
-    return
-end
+local heartbeatConnection
 
 local function highlightZombies()
+    if not zombiesFolder then return end
+
     for _, zombie in pairs(zombiesFolder:GetChildren()) do
         if zombie:IsA("Model") and zombie.PrimaryPart then
-            if not zombie:FindFirstChild("Highlight") then
-                local highlight = Instance.new("Highlight")
-                highlight.Adornee = zombie
-                highlight.FillColor = Color3.fromRGB(255, 0, 0) -- Red highlight
-                highlight.OutlineColor = Color3.fromRGB(255, 255, 255) -- White outline
-                highlight.Parent = zombie
-            end
+            if espEnabled then
+                -- Create Highlight if it doesn't exist
+                if not zombie:FindFirstChild("Highlight") then
+                    local highlight = Instance.new("Highlight")
+                    highlight.Adornee = zombie
+                    highlight.FillColor = Color3.fromRGB(255, 0, 0) -- Red highlight
+                    highlight.OutlineColor = Color3.fromRGB(255, 255, 255) -- White outline
+                    highlight.Parent = zombie
+                end
 
-            if not zombie:FindFirstChild("BillboardGui") then
-                -- Create a BillboardGui for the nametag
-                local billboard = Instance.new("BillboardGui")
-                billboard.Size = UDim2.new(4, 0, 1, 0)
-                billboard.StudsOffset = Vector3.new(0, 3, 0) -- Adjust height above the head
-                billboard.Adornee = zombie.PrimaryPart
-                billboard.Parent = zombie
-                billboard.AlwaysOnTop = true
+                -- Create BillboardGui if it doesn't exist
+                if not zombie:FindFirstChild("BillboardGui") then
+                    local billboard = Instance.new("BillboardGui")
+                    billboard.Size = UDim2.new(4, 0, 1, 0)
+                    billboard.StudsOffset = Vector3.new(0, 3, 0) -- Adjust height above the head
+                    billboard.Adornee = zombie.PrimaryPart
+                    billboard.Parent = zombie
+                    billboard.AlwaysOnTop = true
 
-                -- Create the TextLabel
-                local textLabel = Instance.new("TextLabel")
-                textLabel.Size = UDim2.new(1, 0, 1, 0)
-                textLabel.BackgroundTransparency = 1
-                textLabel.Text = "Stupid Zombie"
-                textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-                textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-                textLabel.TextStrokeTransparency = 0
-                textLabel.Font = Enum.Font.SourceSansBold
-                textLabel.TextScaled = true
-                textLabel.Parent = billboard
+                    -- Create the TextLabel
+                    local textLabel = Instance.new("TextLabel")
+                    textLabel.Size = UDim2.new(1, 0, 1, 0)
+                    textLabel.BackgroundTransparency = 1
+                    textLabel.Text = "Stupid Zombie"
+                    textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+                    textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+                    textLabel.TextStrokeTransparency = 0
+                    textLabel.Font = Enum.Font.SourceSansBold
+                    textLabel.TextScaled = true
+                    textLabel.Parent = billboard
+                end
+            else
+                -- Remove Highlight if ESP is disabled
+                local highlight = zombie:FindFirstChild("Highlight")
+                if highlight then
+                    highlight:Destroy()
+                end
+
+                -- Remove BillboardGui if ESP is disabled
+                local billboard = zombie:FindFirstChild("BillboardGui")
+                if billboard then
+                    billboard:Destroy()
+                end
             end
         end
     end
 end
 
--- Run the function initially
-highlightZombies()
+-- Toggle ESP function
+local function toggleESP()
+    espEnabled = not espEnabled
 
--- Check for new zombies in a loop
-RunService.Heartbeat:Connect(function()
-    highlightZombies()
-end)
+    if espEnabled then
+        highlightZombies()
+        heartbeatConnection = runService.Heartbeat:Connect(highlightZombies) -- Run ESP check continuously
+        Rayfield:Notify({
+            Title = "ESP Enabled",
+            Content = "ESP is now active!",
+            Duration = 3,
+            Image = 4483362458
+        })
+    else
+        if heartbeatConnection then
+            heartbeatConnection:Disconnect() -- Stop the loop
+            heartbeatConnection = nil
+        end
+
+        highlightZombies() -- This will remove existing ESP elements
+        Rayfield:Notify({
+            Title = "ESP Disabled",
+            Content = "ESP has been turned off",
+            Duration = 3,
+            Image = 4483362458
+        })
+    end
+end
